@@ -1,0 +1,12 @@
+name: MafiaGame
+version: '${project.version}'
+main: com.kylelovestoad.mafia.Mafia
+api-version: 1.19
+authors: [ kylelovestoad ]
+description: Play mafia with your friends
+commands:
+  mafia:
+    description: Handles operations for mafia
+    usage: /mafia
+    permission: mafia
+    permission-message: You do not have permission to use this command!
