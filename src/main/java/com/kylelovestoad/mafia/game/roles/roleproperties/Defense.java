@@ -1,4 +1,4 @@
-package com.kylelovestoad.mafia.roles.roleproperties;
+package com.kylelovestoad.mafia.game.roles.roleproperties;
 
 public enum Defense {
     NONE,

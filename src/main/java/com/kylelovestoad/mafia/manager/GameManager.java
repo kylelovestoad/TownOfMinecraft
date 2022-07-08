@@ -1,27 +1,34 @@
 package com.kylelovestoad.mafia.manager;
 
-import com.kylelovestoad.mafia.Mafia;
+import com.kylelovestoad.mafia.MafiaPlugin;
 
 public class GameManager {
 
-    private final Mafia plugin;
-
-    private final RoleManager roleManager;
+    private final MafiaPlugin plugin;
 
     private final GameAreaManager gameAreaManager;
 
-    public GameManager(Mafia plugin) {
+    private final ConfigurationManager configurationManager;
+
+    private final RoleManager roleManager;
+
+    public GameManager(MafiaPlugin plugin) {
         this.plugin = plugin;
         this.gameAreaManager = new GameAreaManager(this);
+        this.configurationManager = new ConfigurationManager(this);
         this.roleManager = new RoleManager(this);
     }
 
-    public Mafia getPlugin() {
+    public MafiaPlugin getPlugin() {
         return plugin;
     }
 
     public GameAreaManager getGameAreaManager() {
         return gameAreaManager;
+    }
+
+    public ConfigurationManager getConfigurationManager() {
+        return configurationManager;
     }
 
     public RoleManager getRoleManager() {

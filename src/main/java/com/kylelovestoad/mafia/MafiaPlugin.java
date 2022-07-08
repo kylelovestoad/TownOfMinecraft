@@ -1,36 +1,36 @@
 package com.kylelovestoad.mafia;
 
 import com.kylelovestoad.mafia.commands.MafiaBaseCommand;
+import com.kylelovestoad.mafia.manager.ConfigurationManager;
 import com.kylelovestoad.mafia.manager.GameManager;
-import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.util.Objects;
-import java.util.logging.Logger;
 
-public final class Mafia extends JavaPlugin {
-
-    private final Logger LOGGER = Bukkit.getLogger();
-
+public final class MafiaPlugin extends JavaPlugin {
     private final GameManager gameManager;
-
-    public Mafia() {
+    public MafiaPlugin() {
         this.gameManager = new GameManager(this);
     }
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        LOGGER.info("Successfully Loaded!");
+        getLogger().info("Successfully Loaded!");
 
         Objects.requireNonNull(getCommand("mafia")).setExecutor(new MafiaBaseCommand(this.gameManager));
+
+        ConfigurationManager configurationManager = gameManager.getConfigurationManager();
+
+        configurationManager.generateMainConfig();
+        configurationManager.saveConfig();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        LOGGER.info("Disabled");
+        getLogger().info("Disabled");
     }
-
-
 }

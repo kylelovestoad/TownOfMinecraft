@@ -1,6 +1,9 @@
 package com.kylelovestoad.mafia.game.tasks;
 
-import com.kylelovestoad.mafia.game.GameArea;
+import com.kylelovestoad.mafia.game.states.GameArea;
+import com.kylelovestoad.mafia.game.states.LobbyGameState;
+import com.kylelovestoad.mafia.manager.ConfigurationManager;
+import com.kylelovestoad.mafia.manager.GameManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -10,11 +13,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameStartingTask extends BukkitRunnable {
 
+    private final GameManager gameManager;
     private final GameArea gameArea;
     private final Runnable onStart;
     private int secondsUntilStart;
 
-    public GameStartingTask(GameArea gameArea, Runnable onStart, int secondsUntilStart) {
+    public GameStartingTask(GameManager gameManager, GameArea gameArea, Runnable onStart, int secondsUntilStart) {
+        this.gameManager = gameManager;
         this.gameArea = gameArea;
         this.onStart = onStart;
         this.secondsUntilStart = secondsUntilStart;
@@ -28,6 +33,18 @@ public class GameStartingTask extends BukkitRunnable {
             cancel();
             onStart.run();
             return;
+        }
+
+        int numActivePlayers = gameArea.getActivePlayers().size();
+        int minPlayers = gameManager.getConfigurationManager()
+                .getMainConfig()
+                .getConfigurationSection("players").getInt("minPlayers");
+
+        if (numActivePlayers < minPlayers) {
+            TextComponent notEnoughPlayersMessage = Component.text("Not enough players to start the game", NamedTextColor.RED);
+            gameArea.broadcastMessage(notEnoughPlayersMessage);
+            gameArea.setGameState(new LobbyGameState(gameArea, gameManager));
+            cancel();
         }
 
         String suffix;

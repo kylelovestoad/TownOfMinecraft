@@ -1,4 +1,4 @@
-package com.kylelovestoad.mafia.game;
+package com.kylelovestoad.mafia.game.states;
 
 import com.kylelovestoad.mafia.manager.GameManager;
 import org.bukkit.entity.Player;

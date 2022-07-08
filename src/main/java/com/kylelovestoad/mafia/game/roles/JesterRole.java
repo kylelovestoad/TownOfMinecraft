@@ -1,11 +1,13 @@
-package com.kylelovestoad.mafia.roles;
+package com.kylelovestoad.mafia.game.roles;
 
-import com.kylelovestoad.mafia.roles.roleproperties.Attack;
-import com.kylelovestoad.mafia.roles.roleproperties.Defense;
-import com.kylelovestoad.mafia.roles.roleproperties.Faction;
+import com.kylelovestoad.mafia.game.roles.roleproperties.Attack;
+import com.kylelovestoad.mafia.game.roles.roleproperties.Defense;
+import com.kylelovestoad.mafia.game.roles.roleproperties.Faction;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.format.TextColor;
 
-public class JesterRole implements Role {
+public class JesterRole extends Role {
     @Override
     public Faction faction() {
         return Faction.NEUTRAL;
@@ -27,8 +29,8 @@ public class JesterRole implements Role {
     }
 
     @Override
-    public String description() {
-        return "Wants to get themselves voted out";
+    public Sound introSound() {
+        return Sound.sound(Key.key("block.bell.use"), Sound.Source.BLOCK, 1, 1);
     }
 
     @Override
@@ -39,6 +41,11 @@ public class JesterRole implements Role {
     @Override
     public Defense defensePower() {
         return Defense.NONE;
+    }
+
+    @Override
+    public boolean isUnique() {
+        return false;
     }
 
 }

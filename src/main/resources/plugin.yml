@@ -1,6 +1,6 @@
 name: MafiaGame
 version: '${project.version}'
-main: com.kylelovestoad.mafia.Mafia
+main: com.kylelovestoad.mafia.MafiaPlugin
 api-version: 1.19
 authors: [ kylelovestoad ]
 description: Play mafia with your friends

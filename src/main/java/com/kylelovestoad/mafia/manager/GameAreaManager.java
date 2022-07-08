@@ -1,8 +1,6 @@
 package com.kylelovestoad.mafia.manager;
 
-import com.kylelovestoad.mafia.Mafia;
-import com.kylelovestoad.mafia.game.GameArea;
-import com.kylelovestoad.mafia.game.tasks.GameStartingTask;
+import com.kylelovestoad.mafia.game.states.GameArea;
 
 import java.util.ArrayList;
 import java.util.List;

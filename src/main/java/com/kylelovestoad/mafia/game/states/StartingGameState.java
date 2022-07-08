@@ -1,6 +1,6 @@
-package com.kylelovestoad.mafia.game;
+package com.kylelovestoad.mafia.game.states;
 
-import com.kylelovestoad.mafia.Mafia;
+import com.kylelovestoad.mafia.MafiaPlugin;
 import com.kylelovestoad.mafia.game.tasks.GameStartingTask;
 import com.kylelovestoad.mafia.manager.GameManager;
 import org.bukkit.entity.Player;
@@ -21,12 +21,13 @@ public class StartingGameState extends GameState {
     }
 
     @Override
-    public void onEnable(Mafia mafia) {
-        super.onEnable(mafia);
+    public void onEnable(MafiaPlugin mafiaPlugin) {
+        super.onEnable(mafiaPlugin);
         GameStartingTask gameStartingTask =
-                new GameStartingTask(gameArea, () -> gameArea.setGameState(new ActiveGameState(gameArea, gameManager)), 5);
+                new GameStartingTask(gameManager, gameArea, () ->
+                        gameArea.setGameState(new ActiveGameState(gameArea, gameManager)), 5);
 
-        gameStartingTask.runTaskTimer(mafia, 0, 20);
+        gameStartingTask.runTaskTimer(mafiaPlugin, 0, 20);
     }
 
     private void onQuit(PlayerQuitEvent event) {

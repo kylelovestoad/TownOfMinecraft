@@ -1,14 +1,10 @@
 package com.kylelovestoad.mafia.commands;
 
 import com.kylelovestoad.mafia.commands.subcommands.*;
-import com.kylelovestoad.mafia.game.ActiveGameState;
-import com.kylelovestoad.mafia.game.GameArea;
-import com.kylelovestoad.mafia.game.LobbyGameState;
-import com.kylelovestoad.mafia.game.StartingGameState;
+import com.kylelovestoad.mafia.game.states.GameArea;
+import com.kylelovestoad.mafia.game.states.StartingGameState;
 import com.kylelovestoad.mafia.manager.GameManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
+import com.kylelovestoad.mafia.manager.RoleManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class MafiaBaseCommand implements CommandExecutor {
 
