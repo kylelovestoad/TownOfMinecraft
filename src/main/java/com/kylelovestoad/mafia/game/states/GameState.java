@@ -24,5 +24,4 @@ public abstract class GameState implements Listener {
     public void onDisable(MafiaPlugin mafiaPlugin) {
         HandlerList.unregisterAll(this);
     }
-
 }

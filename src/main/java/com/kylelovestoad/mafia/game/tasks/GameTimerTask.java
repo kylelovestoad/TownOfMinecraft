@@ -1,25 +1,20 @@
 package com.kylelovestoad.mafia.game.tasks;
 
-import com.kylelovestoad.mafia.game.states.GameArea;
-import com.kylelovestoad.mafia.manager.GameManager;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
+import com.kylelovestoad.mafia.game.Game;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameTimerTask extends BukkitRunnable {
-    private final GameArea gameArea;
-
-    private final String heading;
+    private final Runnable onCycle;
     private final Runnable onEnd;
     private int secondsUntilEnd;
 
 
-    public GameTimerTask(GameArea gameArea, String heading, Runnable onEnd, int secondsUntilEnd) {
-        this.gameArea = gameArea;
-        this.heading = heading;
+    public GameTimerTask(Runnable onCycle, Runnable onEnd, int secondsUntilEnd) {
+        this.onCycle = onCycle;
         this.onEnd = onEnd;
         this.secondsUntilEnd = secondsUntilEnd;
     }
@@ -28,18 +23,14 @@ public class GameTimerTask extends BukkitRunnable {
     @Override
     public void run() {
 
-        if (secondsUntilEnd <= 0) {
-            cancel();
+        if (secondsUntilEnd == 0) {
             onEnd.run();
+            this.cancel();
             return;
         }
 
-        TextComponent countDownMessage = Component.text(heading + ": ", NamedTextColor.RED)
-                .append(Component.text(secondsUntilEnd, NamedTextColor.YELLOW));
-
-        gameArea.broadcastMessage(countDownMessage);
+        onCycle.run();
         secondsUntilEnd--;
-
     }
 }
 

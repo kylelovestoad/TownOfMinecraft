@@ -2,7 +2,6 @@ package com.kylelovestoad.mafia.manager;
 
 import com.kylelovestoad.mafia.MafiaPlugin;
 import com.kylelovestoad.mafia.game.roles.Role;
-import com.kylelovestoad.mafia.ConfigurationBundle;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,40 +10,31 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Class used to interact with configuration
+ */
 public class ConfigurationManager {
 
 
-    private final GameManager gameManager;
+    private final GeneralManager generalManager;
 
-    private final YamlConfiguration mainConfig;
-    private final YamlConfiguration gameAreaConfig;
+    private final List<ConfigurationBundle> configurationBundles = new ArrayList<>();
 
-    private final YamlConfiguration gameModeConfig;
-    private final File mainConfigFile;
-    private final File gameAreaConfigFile;
-    private final File gameModeConfigFile;
+    public ConfigurationManager(GeneralManager generalManager) {
+        this.generalManager = generalManager;
 
-    public ConfigurationManager(GameManager gameManager) {
-        this.gameManager = gameManager;
+        createConfig("general.yml");
+        createConfig("maps.yml");
+        createConfig("gamemodes.yml");
 
-        ConfigurationBundle generalBundle = createConfig("general.yml");
-        ConfigurationBundle gameAreaBundle = createConfig("maps.yml");
-        ConfigurationBundle gameModeBundle = createConfig("gamemodes.yml");
-
-        mainConfig = generalBundle.getYamlConfiguration();
-        mainConfigFile = generalBundle.getFile();
-
-        gameAreaConfig = gameAreaBundle.getYamlConfiguration();
-        gameAreaConfigFile = gameAreaBundle.getFile();
-
-        gameModeConfig = gameModeBundle.getYamlConfiguration();
-        gameModeConfigFile = gameModeBundle.getFile();
     }
 
-    public ConfigurationBundle createConfig(String filename) {
-        MafiaPlugin mafiaPlugin = gameManager.getPlugin();
+    public void createConfig(String filename) {
+        MafiaPlugin mafiaPlugin = generalManager.getPlugin();
         File dataFolder = mafiaPlugin.getDataFolder();
         Logger logger = mafiaPlugin.getLogger();
 
@@ -55,6 +45,8 @@ public class ConfigurationManager {
 
         File configFile = new File(dataFolder, filename);
 
+        configurationBundles.add(new ConfigurationBundle(configFile, new YamlConfiguration()));
+
         if (!configFile.exists()) {
             try {
                 configFile.createNewFile();
@@ -64,42 +56,54 @@ public class ConfigurationManager {
                 throw new RuntimeException(e);
             }
         }
-
-        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(configFile);
-
-        return new ConfigurationBundle(yamlConfiguration, configFile);
-
     }
 
     public void saveConfig() {
-        try {
-            mainConfig.save(mainConfigFile);
-            gameAreaConfig.save(gameAreaConfigFile);
-            gameModeConfig.save(gameModeConfigFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        configurationBundles.forEach(configurationBundle -> {
+            try {
+                // TODO uncomment this later to prevent user's config from being reset after restart
+//                if (configurationBundle.getFile().exists() && configurationBundle.getFile().length() != 0) {
+//                    return;
+//                }
+                configurationBundle.getYamlConfiguration().save(configurationBundle.getFile());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void generateMainConfig() {
 
-        // So that user defined config doesn't get reset to default on restart or reload
-        if (mainConfigFile.exists()) {
-            return;
-        }
+        File mainConfigFile = getConfigFile("general.yml");
+        YamlConfiguration mainConfig = getConfig("general.yml");
+
+        generalManager.getPlugin().getLogger().info(String.valueOf(mainConfigFile.length()));
+
+
+
+        ConfigurationSection generalSection = mainConfig.createSection("general");
+        generalSection.set("maxTrials", 3);
 
         ConfigurationSection playersSection = mainConfig.createSection("players");
         playersSection.set("minPlayers", 1);
         playersSection.set("maxPlayers", 15);
         playersSection.set("maxMafia", 4);
 
+        ConfigurationSection itemsSection = mainConfig.createSection("item_names");
+        itemsSection.set("alive_players_checker", "Alive Players");
+        itemsSection.set("graveyard_players_checker", "Graveyard Players");
+        itemsSection.set("arsonist_ability", "Douse");
+
         mainConfig.createSection("roles");
-        gameManager.getRoleManager().getRoles().forEach(this::saveRole);
+        generalManager.getRoleManager().getRoles().forEach(this::saveRole);
 
     }
 
     public void generateGameModeConfig() {
 
+        File gameModeConfigFile = getConfigFile("gamemodes.yml");
+
+        //TODO maybe
         if (gameModeConfigFile.exists()) {
             return;
         }
@@ -107,6 +111,9 @@ public class ConfigurationManager {
     }
 
     public void saveRole(Role role) {
+        YamlConfiguration mainConfig = getConfig("general.yml");
+
+
         String roleNameLower = role.name().toLowerCase();
         if (mainConfig.isConfigurationSection(roleNameLower)) {
             mainConfig.set(roleNameLower, null);
@@ -149,11 +156,37 @@ public class ConfigurationManager {
         );
     }
 
-    public YamlConfiguration getMainConfig() {
-        return mainConfig;
+    private ConfigurationBundle getConfigurationBundle(String filename) {
+        return configurationBundles.stream()
+                .filter(configurationBundle -> configurationBundle.getFile().getName().equals(filename))
+                .findFirst()
+                .orElse(null);
     }
 
-    public YamlConfiguration getGameAreaConfig() {
-        return gameAreaConfig;
+    public File getConfigFile(String filename) {
+        return getConfigurationBundle(filename).getFile();
+    }
+
+    public YamlConfiguration getConfig(String filename) {
+        return getConfigurationBundle(filename).getYamlConfiguration();
+    }
+
+    private class ConfigurationBundle {
+
+        private final File file;
+        private final YamlConfiguration yamlConfiguration;
+
+        public ConfigurationBundle(File file, YamlConfiguration yamlConfiguration) {
+            this.file = file;
+            this.yamlConfiguration = yamlConfiguration;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public YamlConfiguration getYamlConfiguration() {
+            return yamlConfiguration;
+        }
     }
 }

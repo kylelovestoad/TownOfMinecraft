@@ -1,17 +1,20 @@
 package com.kylelovestoad.mafia.game.roles;
 
-import com.kylelovestoad.mafia.GamePlayer;
-import com.kylelovestoad.mafia.game.roles.roleproperties.Attack;
-import com.kylelovestoad.mafia.game.roles.roleproperties.Defense;
-import com.kylelovestoad.mafia.game.roles.roleproperties.Faction;
+import com.kylelovestoad.mafia.game.Game;
+import com.kylelovestoad.mafia.game.gameplayers.neutral.ExecutionerPlayer;
+import com.kylelovestoad.mafia.game.gameplayers.GamePlayer;
+import com.kylelovestoad.mafia.game.roles.properties.Attack;
+import com.kylelovestoad.mafia.game.roles.properties.Defense;
+import com.kylelovestoad.mafia.game.roles.properties.Faction;
+import com.kylelovestoad.mafia.manager.GeneralManager;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
-public class ExecutionerRole extends Role {
+import java.util.UUID;
 
-    private GamePlayer<?> target = null;
+public class ExecutionerRole implements Role {
 
     @Override
     public Faction faction() {
@@ -34,11 +37,11 @@ public class ExecutionerRole extends Role {
         return Sound.sound(Key.key("entity.blaze.hurt"), Sound.Source.BLOCK, 1, 1);
     }
     @Override
-    public Attack attackPower() {
+    public Attack attack() {
         return Attack.NONE;
     }
     @Override
-    public Defense defensePower() {
+    public Defense defense() {
         return Defense.BASIC;
     }
     @Override
@@ -46,11 +49,9 @@ public class ExecutionerRole extends Role {
         return false;
     }
 
-    public GamePlayer<?> getTarget() {
-        return target;
+    @Override
+    public GamePlayer gamePlayerOf(UUID playerUUID, Game game, GeneralManager generalManager) {
+        return new ExecutionerPlayer(playerUUID, this, game, generalManager);
     }
 
-    public void setTarget(GamePlayer<?> target) {
-        this.target = target;
-    }
 }

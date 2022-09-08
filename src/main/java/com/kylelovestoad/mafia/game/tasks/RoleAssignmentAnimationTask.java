@@ -1,6 +1,6 @@
 package com.kylelovestoad.mafia.game.tasks;
 
-import com.kylelovestoad.mafia.GamePlayer;
+import com.kylelovestoad.mafia.game.gameplayers.GamePlayer;
 import com.kylelovestoad.mafia.game.roles.Role;
 import com.kylelovestoad.mafia.manager.RoleManager;
 import net.kyori.adventure.key.Key;
@@ -15,20 +15,20 @@ import java.time.Duration;
 
 public class RoleAssignmentAnimationTask extends BukkitRunnable {
 
-    private final GamePlayer<? extends Role> gamePlayer;
+    private final GamePlayer gamePlayer;
     private final RoleManager roleManager;
-    private int animationAmount;
+    private int animationTime;
 
-    public RoleAssignmentAnimationTask(GamePlayer<?> gamePlayer, RoleManager roleManager, int animationAmount) {
+    public RoleAssignmentAnimationTask(GamePlayer gamePlayer, RoleManager roleManager, int animationTime) {
         this.gamePlayer = gamePlayer;
         this.roleManager = roleManager;
-        this.animationAmount = animationAmount;
+        this.animationTime = animationTime;
     }
 
     @Override
     public void run() {
 
-        if (animationAmount <= 0) {
+        if (animationTime <= 0) {
             this.cancel();
             return;
         }
@@ -39,7 +39,7 @@ public class RoleAssignmentAnimationTask extends BukkitRunnable {
         TextComponent roleSubtitle;
         Sound sound;
 
-        if (animationAmount != 1) {
+        if (animationTime != 1) {
             role = roleManager.getRandomRole();
             roleTitle = Component.text(role.name(), role.color());
             roleSubtitle = Component.text("", NamedTextColor.WHITE);
@@ -60,6 +60,6 @@ public class RoleAssignmentAnimationTask extends BukkitRunnable {
 
         gamePlayer.getPlayer().playSound(sound);
 
-        animationAmount--;
+        animationTime--;
     }
 }

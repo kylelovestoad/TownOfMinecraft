@@ -1,38 +1,32 @@
 package com.kylelovestoad.mafia.manager;
 
-import com.kylelovestoad.mafia.GamePlayer;
+import com.kylelovestoad.mafia.game.Game;
+import com.kylelovestoad.mafia.game.gameplayers.GamePlayer;
 import com.kylelovestoad.mafia.game.roles.*;
-import com.kylelovestoad.mafia.game.roles.roleproperties.Faction;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import org.bukkit.entity.Player;
+import com.kylelovestoad.mafia.game.roles.properties.Faction;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+/**
+ * Manages role assignment & other role related operations
+ */
 public class RoleManager {
 
-    private final GameManager gameManager;
+    private final GeneralManager generalManager;
 
     private final List<Role> roles = new ArrayList<>();
 
-    private final List<GamePlayer<?>> gamePlayers = new ArrayList<>();
-
-    // Manages role assignment & other role related operations
-    public RoleManager(GameManager gameManager) {
-        this.gameManager = gameManager;
-        addRole(new VillagerRole());
-        addRole(new MafiosoRole());
-        addRole(new JesterRole());
-        addRole(new ExecutionerRole());
+    public RoleManager(GeneralManager generalManager) {
+        this.generalManager = generalManager;
+//        addRole(new VillagerRole());
+//        addRole(new MafiosoRole());
+//        addRole(new JesterRole());
+//        addRole(new ExecutionerRole());
         addRole(new ArsonistRole());
     }
-
-    //FIXME MULTIPLE GAMES WONT BE ABLE TO RUN BECAUSE THERE IS ONLY ONE INSTANCE OF ROLEMANAGER
-
 
     public void addRole(Role role) {
 
@@ -49,34 +43,6 @@ public class RoleManager {
         return roles;
     }
 
-    public <T extends Role> List<GamePlayer<T>> getPlayersFromRole(Class<T> roleClass) throws ClassCastException {
-        //noinspection unchecked
-        return gamePlayers.stream()
-                        .filter(gamePlayer -> gamePlayer.isRole(roleClass))
-                        .map(gamePlayer -> (GamePlayer<T>) gamePlayer)
-                        .collect(Collectors.toList());
-    }
-
-    public void assignRole(Player player, Role role) {
-        gamePlayers.add(new GamePlayer<>(player, role));
-    }
-
-    public List<GamePlayer<? extends Role>> getGamePlayers() {
-        return gamePlayers;
-    }
-
-    public List<GamePlayer<? extends Role>> getTownPlayers() {
-        return gamePlayers.stream()
-                .filter(gamePlayer -> gamePlayer.isFaction(Faction.TOWN))
-                .collect(Collectors.toList());
-    }
-
-    public List<GamePlayer<? extends Role>> getMafiaPlayers() {
-        return gamePlayers.stream()
-                .filter(gamePlayer -> gamePlayer.isFaction(Faction.MAFIA))
-                .collect(Collectors.toList());
-    }
-
     public Role getRandomRole() {
         final Random random = new Random();
         return roles.get(random.nextInt(roles.size()));
@@ -88,19 +54,20 @@ public class RoleManager {
      * This method will be updated to support custom game modes in the future
      * @return The random role from a filtered list
      */
-    public Role getRandomRoleFiltered() {
+    public Role getRandomRoleFiltered(Game game) {
 
-        ConfigurationManager configurationManager = gameManager.getConfigurationManager();
+        ConfigurationManager configurationManager = generalManager.getConfigurationManager();
 
 //        int maxPlayers = configurationManager.getMainConfig()
 //                .getConfigurationSection("players")
 //                .getInt("maxPlayers");
 
-        int maxMafia = configurationManager.getMainConfig()
+        int maxMafia = configurationManager.getConfig("general.yml")
                 .getConfigurationSection("players")
                 .getInt("maxMafia");
 
-        boolean mafiaSlotsFilled = getMafiaPlayers().size() == maxMafia;
+
+        boolean mafiaSlotsFilled = game.getMafiaPlayers().size() == maxMafia;
 
         List<Role> filteredRoles = roles;
 
@@ -114,7 +81,7 @@ public class RoleManager {
         }
 
         // Disallow getting multiple unique roles in one game
-        for (GamePlayer<?> gamePlayer : gamePlayers) {
+        for (GamePlayer gamePlayer : game.getGamePlayers()) {
             Role gamePlayerRole = gamePlayer.getRole();
             if (gamePlayerRole.isUnique()) {
                 filteredRoles = filteredRoles.stream()

@@ -1,10 +1,9 @@
 package com.kylelovestoad.mafia.commands;
 
 import com.kylelovestoad.mafia.commands.subcommands.*;
-import com.kylelovestoad.mafia.game.states.GameArea;
+import com.kylelovestoad.mafia.game.Game;
 import com.kylelovestoad.mafia.game.states.StartingGameState;
-import com.kylelovestoad.mafia.manager.GameManager;
-import com.kylelovestoad.mafia.manager.RoleManager;
+import com.kylelovestoad.mafia.manager.GeneralManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,12 +15,12 @@ import java.util.List;
 
 public class MafiaBaseCommand implements CommandExecutor {
 
-    private final GameManager gameManager;
+    private final GeneralManager generalManager;
 
     private final List<SubCommand<?>> subCommands = new ArrayList<>();
 
-    public MafiaBaseCommand(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public MafiaBaseCommand(GeneralManager generalManager) {
+        this.generalManager = generalManager;
         subCommands.add(new ConfigSubCommand());
         subCommands.add(new GameAreaSubCommand());
         subCommands.add(new JoinSubCommand());
@@ -35,10 +34,9 @@ public class MafiaBaseCommand implements CommandExecutor {
         TODO: create a command that allows players to join, as well as an actual activator for the start game state
          */
 
-        GameArea gameArea = new GameArea("Test", gameManager);
+        Game game = new Game("Test", generalManager);
         Player player = sender.getServer().getPlayer("kylelovestoad");
-        gameArea.addPlayer(player);
-        gameArea.setGameState(new StartingGameState(gameArea, gameManager));
+        game.addPlayer(player);
 
 //        if (args.length == 0) {
 //            TextComponent noArgsMessage = Component.text("/mafia <config|join|leave>", NamedTextColor.RED);
